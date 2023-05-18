@@ -10,11 +10,11 @@ import signal
 #variables globales
 #semaforos
 mutex = threading.Semaphore(1)
-sem_fumador = [threading.Semaphore(0), threading.Semaphore(0), threading.Semaphore(0)]
+sem_fumador = [threading.Semaphore(0), threading.Semaphore(0), threading.Semaphore(0), threading.Semaphore(0), threading.Semaphore(0)]
 #semaforos para los ingredientes
-sem_ingrediente = [threading.Semaphore(0), threading.Semaphore(0), threading.Semaphore(0)]
+sem_ingrediente = [threading.Semaphore(0), threading.Semaphore(0), threading.Semaphore(0),  threading.Semaphore(0), threading.Semaphore(0)]
 #semaforos para los agentes
-sem_agente = [threading.Semaphore(0), threading.Semaphore(0), threading.Semaphore(0)]
+sem_agente = [threading.Semaphore(0), threading.Semaphore(0), threading.Semaphore(0),   threading.Semaphore(0), threading.Semaphore(0)]
 #semaforo para el agente
 sem_agente = threading.Semaphore(0)
 #semaforo para el fumador
@@ -28,13 +28,15 @@ def agente():
     
     
         sem_agente.acquire()
-        print("\nEl agente esta poniendo los ingredientes")
-        time.sleep(1)
-        sem_ingrediente[random.randint(0,2)].release()
-        sem_ingrediente[random.randint(0,2)].release()
-        sem_ingrediente[random.randint(0,2)].release()
         print("\nEl agente ha puesto los ingredientes")
-        time.sleep(1)
+        time.sleep(3)
+        sem_ingrediente[random.randint(0,4)].release()
+        sem_ingrediente[random.randint(0,4)].release()
+        sem_ingrediente[random.randint(0,4)].release()
+        sem_ingrediente[random.randint(0,4)].release()
+        sem_ingrediente[random.randint(0,4)].release()
+        print("\nEl agente ha puesto los ingredientes")
+        time.sleep(3)
         sem_fumador.release()
     
 
@@ -45,8 +47,8 @@ def fumador(id):
     
     while True:
         sem_ingrediente[id].acquire()
-        print("\nEl fumador ", id, " esta fumando")
-        time.sleep(1)
+        print("\nEl fumador {} esta fumando".format(id))
+        time.sleep(3)
         sem_agente.release()
         
 
@@ -54,20 +56,17 @@ def fumador(id):
 #funcion para el main
 def main():
     
-    
-    
-    
-    
     #creacion de los hilos
     hilo_agente = threading.Thread(target=agente)
-    hilo_fumador = [threading.Thread(target=fumador, args=(0,)), threading.Thread(target=fumador, args=(1,)), threading.Thread(target=fumador, args=(2,))]
+    hilo_fumador = [threading.Thread(target=fumador, args=(0,)), threading.Thread(target=fumador, args=(1,)), threading.Thread(target=fumador, args=(2,)), threading.Thread(target=fumador, args=(3,)), threading.Thread(target=fumador, args=(4,))]
     
     #inicializacion de los hilos
     hilo_agente.start()
     hilo_fumador[0].start()
     hilo_fumador[1].start()
     hilo_fumador[2].start()
-    
+    hilo_fumador[3].start()
+    hilo_fumador[4].start()
     #inicializacion del agente
     sem_agente.release()
     
@@ -76,23 +75,16 @@ def main():
     hilo_fumador[0].join()
     hilo_fumador[1].join()
     hilo_fumador[2].join()
+    hilo_fumador[3].join()
+    hilo_fumador[4].join()
     
 
-#funcion para el control de la interrupcion
-def signal_handler(signal, frame):
-        
-        
-        print('You pressed Ctrl+C!')
-        sys.exit(0)
+
 
 
 
 #funcion principal
 if __name__ == "__main__":
-        
-        
-        #control de la interrupcion
-        signal.signal(signal.SIGINT, signal_handler)
-        
+                
         #ejecucion del main
         main()
